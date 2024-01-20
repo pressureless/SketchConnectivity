@@ -134,7 +134,7 @@ async def run_subprocess_in_bg(case, cmd, timeout):
         *cmd,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
-        creationflags=DETACHED_PROCESS,
+        # creationflags=DETACHED_PROCESS,
     )
 
     with lock:
@@ -262,7 +262,7 @@ async def main():
 
 
 if __name__ == '__main__':
-    loop = asyncio.ProactorEventLoop()
+    loop = asyncio.SelectorEventLoop()
     asyncio.set_event_loop(loop)
     try:
         asyncio.get_event_loop().run_until_complete(main())
