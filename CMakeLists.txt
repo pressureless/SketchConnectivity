@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.19)
 
 project(sketching)
 
@@ -12,14 +12,14 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 file(GLOB_RECURSE HEADER_FILES CONFIGURE_DEPENDS src/*.h)
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*.cpp)
-set(NATVIS_FILES src/sketching/sketching.natvis)
+#set(NATVIS_FILES src/sketching/sketching.natvis)
 
 if (MSVC)
     string(REPLACE "/Ob0" "" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 endif()
 
 add_library(${PROJECT_NAME}
-            ${HEADER_FILES} ${SOURCE_FILES} ${NATVIS_FILES})
+            ${HEADER_FILES} ${SOURCE_FILES})
 source_group(TREE ${PROJECT_SOURCE_DIR}/src FILES ${HEADER_FILES} ${SOURCE_FILES})
 target_include_directories(${PROJECT_NAME} PUBLIC src)
 set_property(TARGET ${PROJECT_NAME} PROPERTY PROJECT_LABEL lib${PROJECT_NAME})
@@ -62,6 +62,7 @@ target_precompile_headers(${PROJECT_NAME} PRIVATE
 find_package(Eigen3 3.3.7 CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PUBLIC Eigen3::Eigen)
 
+
 find_package(fmt CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PUBLIC fmt::fmt)
 
@@ -71,6 +72,25 @@ if (SPDLOG_HEADER_ONLY)
 else()
     target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog)
 endif()
+
+# Gurobi
+if (GUROBI_DIR STREQUAL "")
+    set(GUROBI_DIR "$ENV{GUROBI_HOME}")
+
+    # Ok, I used the 'cmake gui' to build with VS17, which required several cache deletes, 
+    # then I used ctrl-shift-p in vscode to do build. 
+else()
+    message(STATUS "Using GUROBI_DIR: ${GUROBI_DIR}")
+endif()
+set(GUROBI_DIR "/Library/gurobi1100/macos_universal2")
+set(GUROBI_INCLUDE_DIRS "/Library/gurobi1100/macos_universal2/include")
+set(GUROBI_CXX_LIBRARY "/usr/local/lib/libgurobi110.dylib")
+
+find_package(GUROBI REQUIRED)
+include_directories(${GUROBI_INCLUDE_DIRS})
+
+include_directories("/usr/local/Cellar/glm/0.9.9.8/include")
+
 
 if (WITH_GUROBI)
     target_compile_definitions(${PROJECT_NAME} PUBLIC HAS_GUROBI)
