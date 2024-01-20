@@ -41,4 +41,16 @@ target_precompile_headers(${PROJECT_NAME} PRIVATE
     <unordered_set>
     <vector>)
 
+    
+set(GUROBI_INCLUDE_DIRS "/Library/gurobi1100/macos_universal2/include")
+set(GUROBI_LIBRARY "/usr/local/lib/libgurobi110.dylib")
+set(GUROBI_CXX_LIBRARY "/Library/gurobi1100/macos_universal2/lib/libgurobi_c++.a")
+
+find_package(GUROBI REQUIRED)
+include_directories(${GUROBI_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} PUBLIC ${GUROBI_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} PUBLIC ${GUROBI_LIBRARY})
+target_link_libraries(${PROJECT_NAME} PUBLIC optimized ${GUROBI_CXX_LIBRARY} debug ${GUROBI_CXX_DEBUG_LIBRARY})
+
+
 target_link_libraries(${PROJECT_NAME} PRIVATE sketching)
